@@ -1,0 +1,38 @@
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.task-card {
+    animation: scaleIn 0.2s ease-out;
+}
+
+.modal-content {
+    animation: slideDown 0.3s ease-out;
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+/* Drag and Drop styles */
+.task-card.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+.task-list.drag-over {
+    background-color: rgba(79, 70, 229, 0.1);
+    outline: 2px dashed var(--primary-color);
+    border-radius: var(--border-radius);
+}

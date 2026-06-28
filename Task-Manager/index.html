@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Task Manager</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dark-mode.css">
+    <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <h1>Kanban Task Manager</h1>
+            <div class="header-actions">
+                <button id="export-btn" class="btn btn-secondary" title="Export to JSON">
+                    <i class="fas fa-download"></i> Export
+                </button>
+                <button id="theme-toggle" class="btn-icon" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="add-task-btn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Task
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Dashboard Statistics Bar -->
+        <section class="stats-bar" id="stats-bar">
+            <div class="stat-item">
+                <span class="stat-label">Total Tasks</span>
+                <span class="stat-value" id="total-tasks">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">In Progress</span>
+                <span class="stat-value" id="inprogress-tasks">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Completed</span>
+                <span class="stat-value" id="completed-tasks">0</span>
+            </div>
+            <div class="stat-item overdue">
+                <span class="stat-label">Overdue</span>
+                <span class="stat-value" id="overdue-tasks">0</span>
+            </div>
+            <div class="stat-item progress-container">
+                <div class="progress-info">
+                    <span class="stat-label">Completion</span>
+                    <span class="stat-value" id="completion-percent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="completion-bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filters and Search -->
+        <section class="filters-section">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" placeholder="Search tasks...">
+            </div>
+            <div class="filter-actions">
+                <select id="priority-filter">
+                    <option value="all">All Priorities</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                <select id="sort-select">
+                    <option value="dateCreated">Newest First</option>
+                    <option value="dueDate">Due Date (Soonest)</option>
+                    <option value="priority">Priority (High First)</option>
+                </select>
+                <button id="clear-filters" class="btn btn-secondary">Clear</button>
+            </div>
+        </section>
+
+        <!-- Kanban Board -->
+        <div class="board-tabs" id="board-tabs">
+            <button class="tab-btn active" data-column="todo">To Do</button>
+            <button class="tab-btn" data-column="inprogress">In Progress</button>
+            <button class="tab-btn" data-column="done">Done</button>
+        </div>
+
+        <div class="board" id="kanban-board">
+            <!-- To Do Column -->
+            <div class="column" id="todo-column" data-column="todo">
+                <div class="column-header">
+                    <h2>To Do <span class="badge" id="todo-count">0</span></h2>
+                    <button class="add-column-task" data-column="todo"><i class="fas fa-plus"></i></button>
+                </div>
+                <div class="task-list" id="todo-list"></div>
+            </div>
+
+            <!-- In Progress Column -->
+            <div class="column" id="inprogress-column" data-column="inprogress">
+                <div class="column-header">
+                    <h2>In Progress <span class="badge" id="inprogress-count">0</span></h2>
+                    <button class="add-column-task" data-column="inprogress"><i class="fas fa-plus"></i></button>
+                </div>
+                <div class="task-list" id="inprogress-list"></div>
+            </div>
+
+            <!-- Done Column -->
+            <div class="column" id="done-column" data-column="done">
+                <div class="column-header">
+                    <h2>Done <span class="badge" id="done-count">0</span></h2>
+                    <button class="add-column-task" data-column="done"><i class="fas fa-plus"></i></button>
+                </div>
+                <div class="task-list" id="done-list"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Task Modal -->
+    <div class="modal" id="task-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add New Task</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="task-form">
+                <input type="hidden" id="task-id">
+                <div class="form-group">
+                    <label for="title">Title *</label>
+                    <input type="text" id="title" placeholder="Task title (min 3 chars)" required minlength="3">
+                    <span class="error-msg" id="title-error"></span>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="3" placeholder="Task description"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="priority">Priority</label>
+                        <select id="priority">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="due-date">Due Date *</label>
+                        <input type="date" id="due-date" required>
+                        <span class="error-msg" id="due-date-error"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="column-select">Column</label>
+                    <select id="column-select">
+                        <option value="todo">To Do</option>
+                        <option value="inprogress">In Progress</option>
+                        <option value="done">Done</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tags</label>
+                    <div class="tag-input-container">
+                        <div id="tag-pills" class="tag-pills"></div>
+                        <input type="text" id="tag-input" placeholder="Add tag and press Enter">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal">Cancel</button>
+                    <button type="submit" id="save-task" class="btn btn-primary">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirm-modal">
+        <div class="modal-content confirm-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="confirm-cancel">Cancel</button>
+                <button class="btn btn-danger" id="confirm-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Files -->
+    <script src="js/storage.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/stats.js"></script>
+    <script src="js/filters.js"></script>
+    <script src="js/board.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
